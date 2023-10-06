@@ -110,9 +110,9 @@ class RepoManager implements Closeable {
 				MiscHelper.copyLargeDir(fs.get().getPath("assets"), this.root_path.resolve("minecraft").resolve("resources").resolve("assets"));
 			}
 			if (GitCraft.config.loadIntegratedDatapack) {
-				if (fs.get().getPath("data").toFile().exists()) {
+				try {
 					MiscHelper.copyLargeDir(fs.get().getPath("data"), this.root_path.resolve("minecraft").resolve("resources").resolve("data"));
-				}
+				} catch (RuntimeException ignored) {}
 			}
 		}
 
