@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 public class MappingHelper {
 
 	public enum MappingFlavour {
-		MOJMAP, FABRIC_INTERMEDIARY, YARN, MOJMAP_PARCHMENT;
+		MOJMAP, FABRIC_INTERMEDIARY, YARN, MOJMAP_PARCHMENT, LEGACY_INTERMEDIARY_V2;
 
 		@Override
 		public String toString() {
@@ -53,7 +53,7 @@ public class MappingHelper {
 		public boolean supportsComments() {
 			return switch (this) {
 				case MOJMAP_PARCHMENT -> true;
-				case MOJMAP, YARN, FABRIC_INTERMEDIARY -> false;
+				case MOJMAP, YARN, FABRIC_INTERMEDIARY, LEGACY_INTERMEDIARY_V2 -> false;
 			};
 		}
 
@@ -64,7 +64,7 @@ public class MappingHelper {
 		public String getDestinationNS() {
 			return switch (this) {
 				case MOJMAP, YARN, MOJMAP_PARCHMENT -> MappingsNamespace.NAMED.toString();
-				case FABRIC_INTERMEDIARY -> MappingsNamespace.INTERMEDIARY.toString();
+				case FABRIC_INTERMEDIARY, LEGACY_INTERMEDIARY_V2 -> MappingsNamespace.INTERMEDIARY.toString();
 			};
 		}
 
@@ -103,6 +103,15 @@ public class MappingHelper {
 						throw new RuntimeException(e);
 					}
 				}
+				case LEGACY_INTERMEDIARY_V2 -> {
+					try {
+						yield (SemanticVersion.parse(mcVersion.loaderVersion)
+							.compareTo((Version) GitCraftConfig.LEGACY_INTERMEDIARY_START) >= 0
+							&& SemanticVersion.parse(mcVersion.loaderVersion).compareTo((Version) GitCraftConfig.LEGACY_INTERMEDIARY_END) <= 0);
+					} catch (VersionParsingException e) {
+						throw new RuntimeException(e);
+					}
+				}
 			};
 		}
 
@@ -125,6 +134,7 @@ public class MappingHelper {
 				case YARN ->
 					Optional.ofNullable(isYarnBrokenVersion(mcVersion) ? null : mappingsPathYarn(mcVersion)); // exclude broken versions
 				case FABRIC_INTERMEDIARY -> Optional.ofNullable(mappingsPathIntermediary(mcVersion));
+				case LEGACY_INTERMEDIARY_V2 -> Optional.ofNullable(mappingsPathLegacyIntermediary(mcVersion));
 			};
 		}
 
@@ -338,6 +348,22 @@ public class MappingHelper {
 		Path mappingsFile = GitCraft.MAPPINGS.resolve(mcVersion.version + "-intermediary.tiny");
 		if (!mappingsFile.toFile().exists()) {
 			RemoteHelper.downloadToFileWithChecksumIfNotExistsNoRetry(RemoteHelper.urlencodedURL(String.format("https://raw.githubusercontent.com/FabricMC/intermediary/master/mappings/%s.tiny", mappingsIntermediaryPathQuirkVersion(mcVersion.version))), mappingsFile, null, "intermediary mapping", mcVersion.version);
+		}
+		return mappingsFile;
+	}
+
+	private static Path mappingsPathLegacyIntermediary(McVersion mcVersion) {
+		try {
+			if (SemanticVersion.parse(mcVersion.loaderVersion).compareTo((Version) GitCraftConfig.LEGACY_INTERMEDIARY_START) < 0
+				|| SemanticVersion.parse(mcVersion.loaderVersion).compareTo((Version) GitCraftConfig.LEGACY_INTERMEDIARY_END) > 0) {
+				return null;
+			}
+		} catch (VersionParsingException e) {
+			throw new RuntimeException(e);
+		}
+		Path mappingsFile = GitCraft.MAPPINGS.resolve(mcVersion.version + "-intermediary.tiny");
+		if (!mappingsFile.toFile().exists()) {
+			RemoteHelper.downloadToFileWithChecksumIfNotExistsNoRetry(RemoteHelper.urlencodedURL(String.format("https://raw.githubusercontent.com/Legacy-Fabric/Legacy-Intermediaries/v2/mappings/%s.tiny", mappingsIntermediaryPathQuirkVersion(mcVersion.version))), mappingsFile, null, "intermediary mapping", mcVersion.version);
 		}
 		return mappingsFile;
 	}

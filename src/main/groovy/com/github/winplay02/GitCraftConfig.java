@@ -35,6 +35,7 @@ public class GitCraftConfig {
 	/// Optional settings
 	public String[] onlyVersion = null;
 	public String minVersion = null;
+	public String maxVersion = null;
 	public String[] excludedVersion = null;
 
 	/// Other Settings
@@ -48,7 +49,8 @@ public class GitCraftConfig {
 	/// Mapping Settings
 	public static final String MIN_SUPPORTED_FABRIC_LOADER = "0.14.23";
 
-	public static final SemanticVersion INTERMEDIARY_MAPPINGS_START_VERSION, YARN_MAPPINGS_START_VERSION, YARN_CORRECTLY_ORIENTATED_MAPPINGS_VERSION, PARCHMENT_START_VERSION;
+	public static final SemanticVersion INTERMEDIARY_MAPPINGS_START_VERSION, YARN_MAPPINGS_START_VERSION,
+		YARN_CORRECTLY_ORIENTATED_MAPPINGS_VERSION, PARCHMENT_START_VERSION, LEGACY_INTERMEDIARY_START, LEGACY_INTERMEDIARY_END;
 
 	static {
 		try {
@@ -56,6 +58,8 @@ public class GitCraftConfig {
 			YARN_MAPPINGS_START_VERSION = SemanticVersion.parse("1.14-alpha.18.49.a");
 			YARN_CORRECTLY_ORIENTATED_MAPPINGS_VERSION = SemanticVersion.parse("1.14.3");
 			PARCHMENT_START_VERSION = SemanticVersion.parse("1.16.5");
+			LEGACY_INTERMEDIARY_START = SemanticVersion.parse("1.8.2-rc.5");
+			LEGACY_INTERMEDIARY_END = SemanticVersion.parse("1.14-alpha.18.43.a");
 		} catch (VersionParsingException e) {
 			throw new RuntimeException(e);
 		}
@@ -134,6 +138,10 @@ public class GitCraftConfig {
 
 	public boolean isMinVersion() {
 		return minVersion != null;
+	}
+
+	public boolean isMaxVersion() {
+		return maxVersion != null;
 	}
 
 	public boolean isAnyVersionExcluded() {

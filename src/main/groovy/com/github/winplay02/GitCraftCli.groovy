@@ -61,6 +61,10 @@ class GitCraftCli {
 			String subjectVersion = cli_args_parsed.'min-version';
 			config.minVersion = subjectVersion;
 		}
+		if (cli_args_parsed.hasOption("max-version")) {
+			String subjectVersion = cli_args_parsed.'max-version';
+			config.maxVersion = subjectVersion;
+		}
 		if (cli_args_parsed.hasOption("exclude-version")) {
 			String[] subjectVersion = cli_args_parsed.'exclude-versions';
 			config.excludedVersion = subjectVersion;

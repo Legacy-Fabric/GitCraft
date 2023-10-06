@@ -299,6 +299,11 @@ public class MinecraftVersionGraph implements Iterable<McVersion> {
 		return new MinecraftVersionGraph(this, (entry -> entry.getKey().compareTo((Version) subjectVersion) >= 0), String.format("min-%s", version.version));
 	}
 
+	public MinecraftVersionGraph filterMaxVersion(McVersion version) {
+		SemanticVersion subjectVersion = parseFromLoaderVersion(version.loaderVersion);
+		return new MinecraftVersionGraph(this, (entry -> entry.getKey().compareTo((Version) subjectVersion) <= 0), String.format("max-%s", version.version));
+	}
+
 	public MinecraftVersionGraph filterOnlyVersion(McVersion... version) {
 		List<McVersion> versionList = Arrays.asList(version);
 		return new MinecraftVersionGraph(this, (entry -> versionList.contains(entry.getValue())), versionList.stream().map((mcv) -> mcv.version).collect(Collectors.joining("-")));

@@ -93,12 +93,22 @@ public class GitCraft {
 				}
 			}
 			gitCraft.versionGraph = gitCraft.versionGraph.filterOnlyVersion(mc_versions);
-		} else if (config.isMinVersion()) {
-			McVersion mc_version = gitCraft.versionGraph.getMinecraftMainlineVersionByName(config.minVersion);
-			if (mc_version == null) {
-				MiscHelper.panic("%s is invalid", config.minVersion);
+		} else {
+			if (config.isMinVersion()) {
+				McVersion mc_version = gitCraft.versionGraph.getMinecraftMainlineVersionByName(config.minVersion);
+				if (mc_version == null) {
+					MiscHelper.panic("%s is invalid", config.minVersion);
+				}
+				gitCraft.versionGraph = gitCraft.versionGraph.filterMinVersion(mc_version);
 			}
-			gitCraft.versionGraph = gitCraft.versionGraph.filterMinVersion(mc_version);
+
+			if (config.isMaxVersion()) {
+				McVersion mc_version = gitCraft.versionGraph.getMinecraftMainlineVersionByName(config.maxVersion);
+				if (mc_version == null) {
+					MiscHelper.panic("%s is invalid", config.maxVersion);
+				}
+				gitCraft.versionGraph = gitCraft.versionGraph.filterMaxVersion(mc_version);
+			}
 		}
 
 		if (config.isAnyVersionExcluded()) {
